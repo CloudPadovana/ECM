@@ -20,7 +20,7 @@ SLAVE_USERDATA=slave-userdata
 cd /tmp
 wget https://pki.cesnet.cz/certs/chain_TERENA_SSL_CA_3.pem
 #
-cat<< EOF >/tmp/cacerts.txt
+cat <<EOF >/tmp/cacerts.txt
 
 INFN CA 2015
 ================
@@ -60,7 +60,7 @@ KjUrC7M6W+Zhicc0ihbwb03ppLv9/vbj06MY4+HMivKiK1oxd+Q=
 EOF
 
 cat /tmp/chain_TERENA_SSL_CA_3.pem >>/tmp/cacerts.txt
-cat<< EOF >>/tmp/cacerts.txt
+cat <<EOF >>/tmp/cacerts.txt
 
 UNIPD CA
 ================
@@ -160,7 +160,7 @@ EOF
 #################
 # CONDOR CONFIG #
 #################
-cat << EOF >/tmp/Cluster 
+cat <<EOF >/tmp/Cluster 
 ##################
 # Ubuntu Cluster #
 ##################
@@ -188,7 +188,7 @@ EOF
 ###############
 # TEST SCRIPT #
 ###############
-cat <<EOF> /tmp/test.sh
+cat <<EOF >/tmp/test.sh
 #!/bin/bash
 HOST=\$(hostname -I | awk '{print $1}')
 DIR=\$(pwd)
@@ -205,13 +205,15 @@ EOF
 ############################
 echo "deb http://90.147.77.142/repo/htcondor/ubuntu/stable/ trusty contrib" >> /etc/apt/sources.list
 wget -qO - http://90.147.77.142/repo/htcondor/ubuntu/HTCondor-Release.gpg.key | apt-key add -
-apt-get update
-apt-get -y install condor
+
+DEBIAN_FRONTEND=noninteractive apt-get update
+DEBIAN_FRONTEND=noninteractive apt-get -y install condor
+
 #
 CUID=$(id condor | awk '{print $1}'| cut -d'=' -f2|cut -d'(' -f1)
 CGID=$(id condor | awk '{print $2}'| cut -d'=' -f2|cut -d'(' -f1)
 #
-cat << EOF >/etc/condor/condor_config.local
+cat <<EOF >/etc/condor/condor_config.local
 
 DAEMON_LIST = COLLECTOR, MASTER, NEGOTIATOR, SCHEDD
 CONDOR_HOST = $HOSTIP
@@ -234,13 +236,13 @@ cat /tmp/Cluster > /etc/condor/config.d/Ubuntu
 #
 service condor start
 #
-apt-get install -y python-boto
+DEBIAN_FRONTEND=noninteractive apt-get install -y python-boto
 wget http://90.147.77.142/repo/elastiq/ubuntu/python-elastiq_0.9.10-1py27_all.deb
 dpkg -i python-elastiq_0.9.10-1py27_all.deb
 #
 cat /tmp/cacerts.txt >> /usr/lib/python2.7/dist-packages/boto/cacerts/cacerts.txt
 #
-cat<< EOF >/etc/elastiq.conf 
+cat <<EOF >/etc/elastiq.conf 
 [elastiq]
 check_queue_every_s = 45
 idle_for_time_s = $IDLE_TIME
@@ -272,7 +274,7 @@ mkdir /home/ubuntu/jobs/
 mkdir /home/ubuntu/jobs/log/
 mkdir /home/ubuntu/jobs/output/
 mkdir /home/ubuntu/jobs/error/
-cat<< EOF > /home/ubuntu/jobs/test.jdl
+cat <<EOF > /home/ubuntu/jobs/test.jdl
 Universe = vanilla
 Executable = /home/ubuntu/jobs/test.sh
 Log = /home/ubuntu/jobs/log/test.log.\$(Cluster)\$(Process)
@@ -280,7 +282,7 @@ Output = /home/ubuntu/jobs/output/test.out.\$(Cluster)\$(Process)
 Error = /home/ubuntu/jobs/error/test.err.\$(Cluster)\$(Process)
 Queue 10
 EOF
-cat<< EOF > /home/ubuntu/jobs/test-docker.jdl
+cat <<EOF > /home/ubuntu/jobs/test-docker.jdl
 universe                = docker
 docker_image            = debian
 executable              = /bin/cat
@@ -297,7 +299,7 @@ cat /tmp/test.sh > /home/ubuntu/jobs/test.sh
 chown ubuntu:root -R /home/ubuntu/jobs/
 chmod u+x -R /home/ubuntu/jobs/
 #
-cat<<EOF>/home/ubuntu/README.txt
+cat <<EOF >/home/ubuntu/README.txt
 Root user can't submit condor jobs.
 You can submit jobs using ubuntu user and you can test condor using the test.jdl file [ condor_submit jobs/test.jdl ].
 Good fun! :)
