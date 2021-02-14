@@ -35,14 +35,14 @@ all_name_ami = []
 #functions
 
 def list_create():
-   args = "euca-describe-images -I $EC2_ACCESS_KEY -S $EC2_SECRET_KEY --debug 2>&1 | grep '<imageId>' | uniq | sed 's/<imageId>//' |sed 's/<\/imageId>//'"
+   args = "euca-describe-images -I $EC2_ACCESS_KEY -S $EC2_SECRET_KEY --filter state=available --debug 2>&1 | grep '<imageId>' | uniq | sed 's/<imageId>//' |sed 's/<\/imageId>//'"
    command = ["/bin/bash", "-c", "%s" %args]
    p = subprocess.Popen(command, stdout=PIPE, stderr=PIPE)
    i, o = p.communicate()
    i = i.strip()
    ami = i.split('\n      ')
 
-   args = "euca-describe-images -I $EC2_ACCESS_KEY -S $EC2_SECRET_KEY --debug 2>&1 | grep '<name>' | uniq |  sed 's/<name>//' |sed 's/<\/name>//'"
+   args = "euca-describe-images -I $EC2_ACCESS_KEY -S $EC2_SECRET_KEY --filter state=available --debug 2>&1 | grep '<name>' | uniq |  sed 's/<name>//' |sed 's/<\/name>//'"
    command = ["/bin/bash", "-c", "%s" %args]
    p = subprocess.Popen(command, stdout=PIPE, stderr=PIPE)
    i, o = p.communicate()
