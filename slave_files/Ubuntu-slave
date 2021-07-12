@@ -3,14 +3,14 @@ HOSTIP=$(hostname -I | awk '{print $1}')
 #
 echo "deb http://90.147.77.142/repo/htcondor/ubuntu/stable/ trusty contrib" >> /etc/apt/sources.list
 wget -qO - http://90.147.77.142/repo/htcondor/ubuntu/HTCondor-Release.gpg.key | apt-key add -
-apt-get update
-sleep 5
-apt-get -y install condor
+DEBIAN_FRONTEND=noninteractive apt-get update
+#sleep 5
+DEBIAN_FRONTEND=noninteractive apt-get -y install condor
 #
 CUID=$(id condor | awk '{print $1}'| cut -d'=' -f2|cut -d'(' -f1)
 CGID=$(id condor | awk '{print $2}'| cut -d'=' -f2|cut -d'(' -f1)
 #
-cat << EOF >/etc/condor/condor_config.local
+cat << EOF > /etc/condor/condor_config.local
 DAEMON_LIST = MASTER, STARTD
 CONDOR_HOST = %ipv4%
 CONDOR_ADMIN = root@%ipv4%
@@ -29,7 +29,7 @@ NO_DNS = True
 DEFAULT_DOMAIN_NAME = INFN-PD
 EOF
 #
-cat <<EOF> /etc/condor/config.d/Ubuntu
+cat <<EOF > /etc/condor/config.d/Ubuntu
 ##################
 # Ubuntu Cluster #
 ##################
@@ -71,6 +71,7 @@ EOF
 /usr/sbin/condor_store_cred -p 12345 add -f /etc/condor/condor_credential
 #
 service condor start
-apt-get -y install docker.io
+
+DEBIAN_FRONTEND=noninteractive apt-get -y install docker.io
 usermod -aG docker condor
 condor_reconfig
